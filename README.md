@@ -1,1 +1,2 @@
 # Algorithms-Project
+This project focuses on efficiently computing crossing edges in a polygon, where shortcuts—straight-line segments between polygon vertices—may intersect. Detecting and handling these crossings is crucial for constructing a valid shortcut hull, a simplified representation of the polygon. The challenge lies in designing an efficient algorithm that quickly identifies and removes crossing edges while ensuring the remaining shortcuts form a closed, enclosing shape.
