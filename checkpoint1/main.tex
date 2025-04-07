@@ -1,0 +1,51 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+% Compact margins
+\geometry{margin=1in}
+
+% Compact section formatting
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titlespacing{\section}{0pt}{10pt}{5pt}
+
+\begin{document}
+\begin{center}
+    \Large\textbf{Polygon Shortcut Hull Paper Summary} \\
+    \vspace{0.5cm}
+\end{center}
+
+\section*{Paper Details}
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item \textbf{Title:} Efficient Computation of Crossing Components and Shortcut Hulls
+    \item \textbf{Authors:} Nikolas Alexander Schwarz and Sabine Storandt
+    \item \textbf{Conference:} 35th International Workshop on Combinatorial Algorithms (IWOCA 2024)
+    \item \textbf{Year:} 2024
+    \item \textbf{DOI/Link:} \url{https://link.springer.com/chapter/10.1007/978-3-031-63021-7_39}
+\end{itemize}
+
+\section{Problem Summary}
+This paper presents efficient algorithms for detecting crossings in polygon structures and simplifying them using shortcut hulls. The authors propose a fast method to identify intersections between shortcut lines, improving computational efficiency from traditional methods. Their approach reduces the time needed to compute shortcut hulls, which are simplified versions of polygons that maintain the original shape while reducing complexity.
+
+\section{Justification}
+This paper is relevant to our project as it provides optimized methods for handling geometric structures, which are useful in fields like computer graphics, geographic information systems (GIS), and motion planning. The efficient handling of crossings and simplification techniques could be applied to real-world applications requiring fast shape processing.
+
+\section{Implementation Feasibility}
+The main tool that will help us in implementing this project is the detailed theoretical explanations of the algorithms provided in this paper.
+
+\section {Team Responsibilities}
+The responsibilities will roughly be divided in the following manner.
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item \textbf{Literature Review:} 
+        Thorough understanding of this paper will be required to implement this project. The task of reading and understanding this paper will be divided equally among both the team members.
+    \item \textbf{Algorithm Implementation:}
+        Two main algorithms that will have to be implemented are crossing detection algorithm and simplifying them using shortcut hulls. We may split the task among our team members such that one person can focus on implementing and working on one of the algorithms
+    \item \textbf{Experimental Validation:}
+        Validate the algorithm on test data. Either the test data will have to be created manually, or if some sample dataset is available, then that dataset will be used.
+    \item \textbf{Report:}
+        Final report will have to created that will cover background, methodology, implementation details, evaluation, and conclusions. Sections of this report will be divided among team members.
+\end{itemize}
+
+\end{document}
