@@ -1,4 +1,4 @@
-🛠️ Updated Project Overview
+# Updated Project Overview
 This project implements an efficient algorithm for constructing shortcut hulls—simplified, enclosing representations of a polygon formed using straight-line shortcuts between non-adjacent vertices. A key challenge lies in detecting and managing crossing shortcuts, which can invalidate the hull if not handled properly.
 
 Building on the paper “Efficient Computation of Crossing Components and Shortcut Hulls”, we now understand that the process involves:
