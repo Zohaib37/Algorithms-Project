@@ -376,7 +376,6 @@ class ShortcutHull:
     def find_pockets(self):
         """Find regions between hull and polygon"""
         self.pockets = []
-        print("Convex Hull:", [str(v) for v in self.convex_hull])
         
         # Match hull vertices to polygon vertices with tolerance
         hull_indices = []
@@ -385,8 +384,6 @@ class ShortcutHull:
                 if self._points_are_equal(hull_vertex, poly_vertex):
                     hull_indices.append(i + 1)  # Convert to 1-indexed
                     break
-        
-        print("Hull Indices in Polygon Order:", hull_indices)
         
         # Sort hull indices in polygon order
         hull_indices.sort()
@@ -405,8 +402,6 @@ class ShortcutHull:
                 pocket.append(end_idx)
                 self.pockets.append(pocket)
         
-        print("Detected Pockets:", self.pockets)
-        
     def _points_are_equal(self, p1, p2, tolerance=1e-6):
         """Compare points with tolerance for floating point precision"""
         return abs(p1.x - p2.x) < tolerance and abs(p1.y - p2.y) < tolerance
@@ -418,32 +413,21 @@ class ShortcutHull:
         
         # Start with convex hull
         self.shortcut_hull = self.convex_hull.copy()
-        print(f"Initial hull has {len(self.shortcut_hull)} vertices")
         
         # Process each pocket
         for pocket_idx, pocket in enumerate(self.pockets):
             if len(pocket) <= 2:
-                print(f"Skipping pocket {pocket_idx} as it's trivial")
                 continue  # Skip trivial pockets
                 
             # Extract pocket vertices
             pocket_vertices = [self.polygon.get_vertex(i) for i in pocket]
-            print(f"\nProcessing pocket {pocket_idx}: {[str(v) for v in pocket_vertices]}")
-            
-            # Compute optimal path for this pocket
-            start_time = time.time()
-            print(f"Computing optimal path for pocket {pocket_idx} with {len(pocket_vertices)} vertices")
             
             # Reset dynamic programming cache for each pocket
             self.dp = {}
             self.optimal_paths = {}
             
+            # Compute optimal path for this pocket
             optimal_path = self._compute_optimal_path(Polygon(pocket_vertices), 0, len(pocket_vertices) - 1)
-            print(f"Optimal path computed in {time.time() - start_time:.2f}s: {len(optimal_path)} vertices")
-            print(f"Optimal path: {[str(p) for p in optimal_path]}")
-            
-            # Visualize the pocket and optimal path for debugging
-            self.plot_pocket_and_path(pocket_vertices, optimal_path, f"Pocket_{pocket_idx}_Lambda_{self.lambda_param}")
             
             # Find indices of pocket endpoints in hull
             start_point = pocket_vertices[0]
@@ -452,24 +436,18 @@ class ShortcutHull:
             start_idx = self._find_point_index_in_hull(start_point)
             end_idx = self._find_point_index_in_hull(end_point)
             
-            print(f"Start point {str(start_point)} found at index {start_idx}")
-            print(f"End point {str(end_point)} found at index {end_idx}")
-            
             if start_idx is None or end_idx is None:
-                print(f"Could not locate pocket endpoints in hull - skipping")
                 continue
             
             # Create new hull by replacing segment
             new_hull = []
             
             if end_idx < start_idx:  # Wrap around case
-                print(f"Wrap-around case: {end_idx} < {start_idx}")
                 # Add vertices from end_idx+1 to start_idx-1
                 new_hull.extend(self.shortcut_hull[end_idx + 1:start_idx])
                 # Add optimal path
                 new_hull.extend(optimal_path)
             else:
-                print(f"Normal case: {start_idx} < {end_idx}")
                 # Add vertices before start_idx
                 new_hull.extend(self.shortcut_hull[:start_idx])
                 # Add optimal path
@@ -477,32 +455,9 @@ class ShortcutHull:
                 # Add vertices after end_idx
                 new_hull.extend(self.shortcut_hull[end_idx+1:])
             
-            print(f"New hull has {len(new_hull)} vertices (was {len(self.shortcut_hull)})")
             self.shortcut_hull = new_hull
         
         return self.shortcut_hull
-    
-    def plot_pocket_and_path(self, pocket_vertices, optimal_path, title):
-        """Visualize a pocket and its optimal path"""
-        plt.figure(figsize=(8, 6))
-        
-        # Plot pocket
-        x_pocket = [p.x for p in pocket_vertices]
-        y_pocket = [p.y for p in pocket_vertices]
-        plt.plot(x_pocket, y_pocket, 'b-', linewidth=1, label='Pocket')
-        plt.scatter(x_pocket, y_pocket, color='blue')
-        
-        # Plot optimal path
-        x_path = [p.x for p in optimal_path]
-        y_path = [p.y for p in optimal_path]
-        plt.plot(x_path, y_path, 'g-', linewidth=2, label='Optimal Path')
-        plt.scatter(x_path, y_path, color='green')
-        
-        plt.title(title)
-        plt.grid(True)
-        plt.legend()
-        plt.savefig(f'pocket_{title.replace(" ", "_")}.png')
-        plt.close()
     
     def _find_point_index_in_hull(self, point, tolerance=1e-9):
         """Find index of point in shortcut hull with tolerance"""
@@ -513,11 +468,8 @@ class ShortcutHull:
     
     def _compute_optimal_path(self, polygon, i, j):
         """Compute optimal path using dynamic programming"""
-        print(f"Computing optimal path for vertices {i} to {j}")
-        
         # Check memo table
         if (i, j) in self.dp:
-            print(f"  Using cached path for {i}-{j}")
             return self.optimal_paths[(i, j)].copy()  # Return a copy to avoid mutation
         
         # Base case: direct edge
@@ -525,7 +477,6 @@ class ShortcutHull:
             path = [polygon.vertices[i], polygon.vertices[j]]
             self.dp[(i, j)] = self.compute_cost(path)
             self.optimal_paths[(i, j)] = path
-            print(f"  Base case: direct path with cost {self.dp[(i, j)]}")
             return path.copy()
         
         # Initialize with direct path as default
@@ -533,7 +484,6 @@ class ShortcutHull:
         direct_cost = self.compute_cost(direct_path)
         min_cost = direct_cost
         optimal_path = direct_path.copy()
-        print(f"  Direct path cost: {direct_cost}")
         
         # Try all intermediate vertices
         for k in range(i + 1, j):
@@ -546,18 +496,15 @@ class ShortcutHull:
             
             # Compute cost
             cost = self.compute_cost(combined_path)
-            print(f"  Path through vertex {k}: cost={cost:.2f} (vs current min={min_cost:.2f})")
             
             # Update if better
             if cost < min_cost:
                 min_cost = cost
                 optimal_path = combined_path.copy()
-                print(f"  → New optimal path through {k} with {len(optimal_path)} vertices")
         
         # Save results
         self.dp[(i, j)] = min_cost
         self.optimal_paths[(i, j)] = optimal_path.copy()
-        print(f"  Final optimal path for {i}-{j}: {len(optimal_path)} vertices with cost {min_cost:.2f}")
         
         return optimal_path.copy()
     
@@ -579,7 +526,6 @@ class ShortcutHull:
             return self.lambda_param * perimeter
         
         # Calculate area using shoelace formula (for closed paths)
-        # For shortcut paths, we close the path by connecting to the original polygon
         area = 0
         for i in range(len(path) - 1):
             area += path[i].x * path[i+1].y
@@ -599,9 +545,6 @@ class ShortcutHull:
         # Calculate weighted cost
         cost = self.lambda_param * perimeter + (1 - self.lambda_param) * area * area_scaling
         
-        print(f"  Path with {len(path)} vertices: perimeter={perimeter:.2f}, area={area:.2f}")
-        print(f"  Weighted cost: {self.lambda_param:.2f}*{perimeter:.2f} + {(1-self.lambda_param):.2f}*{area:.2f}*{area_scaling} = {cost:.2f}")
-        
         return cost
         
 def test_fixed_shortcut_hull():
@@ -619,7 +562,7 @@ def test_fixed_shortcut_hull():
     
     polygon = Polygon(vertices)
     
-    # Test with different lambda values (avoid 0 and 1 exactly)
+    # Test with different lambda values
     lambda_values = [0.01, 0.25, 0.5, 0.75, 0.99]
     fig, axs = plt.subplots(1, len(lambda_values), figsize=(20, 5))
     
