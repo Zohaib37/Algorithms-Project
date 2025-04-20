@@ -1,9 +1,0 @@
-# Shortcut Hull for polygon with 5 vertices
-# Lambda parameter: 0.5
-# Number of vertices in shortcut hull: 5
-# Format: x y
-0 0
-4 0
-4 4
-2 2
-0 4
