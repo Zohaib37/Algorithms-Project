@@ -1,25 +1,7 @@
 # Updated Project Overview
 
-This project is based on the paper **"Efficient Computation of Crossing Components and Shortcut Hulls"**. It implements a polygon simplification algorithm using edge crossings, pseudo-intersection graphs, and shortcut hull optimization through dynamic programming.
+This project is based on the paper **"Efficient Computation of Crossing Components and Shortcut Hulls"**. The algorithm simplifies complex polygon boundaries by inserting straight-line shortcuts between non-adjacent vertices—creating a **shortcut hull** that reduces complexity while preserving shape integrity.
 
----
-
-## 📁 Project Structure
-
-```text
-.
-├── src/ 
-│   └── main.py              # Main implementation of the algorithm
-├── tests/
-│   └── test_polygon.py      # Test file to verify correctness and visualize output
-├── results/
-│   └── *.png                # Visualizations of crossing components & shortcut hulls
-├── report/
-│   ├── cp3_report.tex       # LaTeX source of the progress report
-│   └── cp3_report.pdf       # Compiled PDF progress report
-└── README.md                # You're here!
-
-```text
 ---
 
 ## ✅ Features Implemented
@@ -92,3 +74,19 @@ Install dependencies via pip:
 
 ```bash
 pip install matplotlib numpy shapely
+
+## 📁 Project Structure
+
+```text
+.
+├── src/ 
+│   └── main.py              # Main implementation of the algorithm
+├── tests/
+│   └── test_polygon.py      # Test file to verify correctness and visualize output
+├── results/
+│   └── *.png                # Visualizations of crossing components & shortcut hulls
+├── report/
+│   ├── cp3_report.tex       # LaTeX source of the progress report
+│   └── cp3_report.pdf       # Compiled PDF progress report
+└── README.md                # You're here!
+
