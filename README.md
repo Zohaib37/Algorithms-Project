@@ -5,8 +5,6 @@ This project is based on the paper **"Efficient Computation of Crossing Componen
 ```
 
 ## 📁 Project Structure
-
-```text
 .
 ├── src/ 
 │   └── main.py              # Main implementation of the algorithm
