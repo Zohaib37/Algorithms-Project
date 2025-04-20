@@ -14,7 +14,13 @@ This project is based on the paper **"Efficient Computation of Crossing Componen
 │   └── test_polygon.py      # Test file to verify correctness and visualize output
 ├── results/
 │   └── *.png                # Visualizations of crossing components & shortcut hulls
-├── report/
+├── checkpoint1/
+│   ├── cp1_report.tex       # LaTeX source of the progress report
+│   └── cp1_report.pdf       # Compiled PDF progress report
+├── checkpoint2/
+│   ├── cp2_report.tex       # LaTeX source of the progress report
+│   └── cp2_report.pdf       # Compiled PDF progress report
+├── checkpoint3/
 │   ├── cp3_report.tex       # LaTeX source of the progress report
 │   └── cp3_report.pdf       # Compiled PDF progress report
 └── README.md                # You're here!
