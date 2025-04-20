@@ -6,8 +6,9 @@ This project is based on the paper **"Efficient Computation of Crossing Componen
 
 ## 📁 Project Structure
 
+```text
 .
-├── src/
+├── src/ 
 │   └── main.py              # Main implementation of the algorithm
 ├── tests/
 │   └── test_polygon.py      # Test file to verify correctness and visualize output
@@ -17,7 +18,6 @@ This project is based on the paper **"Efficient Computation of Crossing Componen
 │   ├── cp3_report.tex       # LaTeX source of the progress report
 │   └── cp3_report.pdf       # Compiled PDF progress report
 └── README.md                # You're here!
-
 
 ---
 
