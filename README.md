@@ -2,6 +2,8 @@
 
 This project is based on the paper **"Efficient Computation of Crossing Components and Shortcut Hulls"**. The algorithm simplifies complex polygon boundaries by inserting straight-line shortcuts between non-adjacent vertices—creating a **shortcut hull** that reduces complexity while preserving shape integrity.
 
+Presentation video: https://www.youtube.com/watch?v=zp9f1pQ3RBY
+
 ```
 
 ## 📁 Project Structure
