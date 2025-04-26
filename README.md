@@ -21,14 +21,14 @@ The algorithm achieves significant improvements over previous approaches:
 - **Visualization Tools**: Colored components, lambda-effect illustrations, and comparison views
 - **Performance Optimization**: Sub-quadratic scaling with polygon size
 
+```
+
 ## 📁 Project Structure
 .
-├── src/
-│   ├── main.py              # Main implementation of the algorithm
-│   └── visualization.py     # Enhanced visualization tools
+├── src/ 
+│   └── main.py              # Main implementation of the algorithm
 ├── tests/
-│   ├── test_polygon.py      # Test file to verify correctness and visualize output
-│   └── test_datasets/       # Various polygon datasets for testing
+│   └── test_polygon.py      # Test file to verify correctness and visualize output
 ├── results/
 │   └── *.png                # Visualizations of crossing components & shortcut hulls
 ├── checkpoint1/
@@ -45,6 +45,8 @@ The algorithm achieves significant improvements over previous approaches:
 │   ├── cp4_report.pdf       # Compiled PDF final report
 │   └── presentation.pdf     # Final presentation slides
 └── README.md                # You're here!
+
+```
 
 ## 🔍 How to Run
 
