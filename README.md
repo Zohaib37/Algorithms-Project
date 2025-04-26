@@ -52,9 +52,10 @@ The algorithm achieves significant improvements over previous approaches:
 
 ## 🔍 How to Run
 
-1. Download both `main.py` (from the `src` folder) and `test_polygon.py` (from the `tests` folder).
-2. Place both files in the **same folder**.
-3. Run the test file using:
+1. Install Dependencies : pip install matplotlib numpy shapely
+2. Download both `main.py` (from the `src` folder) and `test_polygon.py` (from the `tests` folder).
+3. Place both files in the **same folder**.
+4. Run the test file using:
    ```bash
    python test_polygon.py
 
