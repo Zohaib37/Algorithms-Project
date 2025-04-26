@@ -63,38 +63,43 @@ The algorithm achieves significant improvements over previous approaches:
 
 ---
 
-🧪 Testing & Validation
-We've implemented comprehensive testing to validate correctness:
+## 🧪 Testing
 
-Unit Tests: For individual algorithm components
+We use a mix of:
 
-Edge crossing detection
-Adjacency list construction
-Component detection
+- **Unit tests** for core components  
+- **Integration tests** for overall flow  
+- **Visual validations** via `matplotlib`  
 
+**Test cases include:**
 
-Integration Tests: For interactions between components
+- Squares with diagonals  
+- Star-shaped polygons  
+- Large random polygons (up to 10,000 vertices)  
 
-Verification of pseudo-intersection graph
-End-to-end testing with varying λ values
+---
 
+## 📈 Benchmarking & Performance
 
-Visual Validation: Visualization tools for debugging and verification
+- **Runtime:** ~4 seconds for polygons with 10,000 vertices  
 
-Original polygons with highlighted crossings
-Color-coded crossing components
-Side-by-side comparisons of polygons and hulls
+**Comparisons made against:**
 
+- Naive edge crossing detection (**13x slower**)  
+- Greedy shortcut selection (**our method is 18–30% better in cost**)  
+- Douglas-Peucker (**faster** but less optimized on our cost function)  
 
+---
 
-📊 Performance Analysis
-Our implementation achieves the theoretical performance improvements described in the paper:
-Polygon SizeRuntime (s)Shortcut Hull Size1000.027202000.068284000.162418000.4255810000.6016420001.3629040002.457128100003.874203
-We've compared our implementation against:
+## 🚀 Enhancements
 
-Naive edge crossing detection (13x slower)
-Greedy shortcut selection (our method is 18-30% better in cost)
-Douglas-Peucker algorithm (faster but less optimal on our cost function)
+- Colored crossing component visualization  
+- λ-effect illustrations on hull shapes  
+- Improved handling of floating-point edge cases  
+- Optimized pocket detection logic  
+
+---
+
 
 🔧 Enhancements
 We've extended the original algorithm with:
