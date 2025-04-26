@@ -91,62 +91,43 @@ We use a mix of:
 
 ---
 
-## 🚀 Enhancements
+# 🚀 Enhancements
 
-- Colored crossing component visualization  
-- λ-effect illustrations on hull shapes  
-- Improved handling of floating-point edge cases  
-- Optimized pocket detection logic  
-
----
-
-
-🔧 Enhancements
 We've extended the original algorithm with:
 
-Expanded Testing on Diverse Datasets:
+### Expanded Testing on Diverse Datasets
+- Custom datasets with up to 10,000 vertices
+- Procedurally generated polygons with controlled complexity
 
-Custom datasets with up to 10,000 vertices
-Procedurally generated polygons with controlled complexity
+### Enhanced Visualization Tools
+- Lambda-effect visualizer showing parameter impact
+- Component coloring for visual representation
+- Side-by-side comparison visualization
 
+### Parameter Exploration
+- Systematic testing with λ values from 0 to 1
+- Analysis of polygon characteristics and λ interaction
 
-Enhanced Visualization Tools:
+# ⚠️ Known Limitations
+- Assumes simple polygons (no self-intersections or holes)
+- Fixed λ parameter requires re-running for different values
+- Memory requirements could be significant for very large polygons
+- Shortcut hull optimization has an unresolved issue that may produce valid but suboptimal hulls
 
-Lambda-effect visualizer showing parameter impact
-Component coloring for visual representation
-Side-by-side comparison visualization
+# 🔮 Future Work
+- Extension to handle polygons with holes or self-intersections
+- Implementation of dynamic λ parameter adjustment
+- Further parallelization of algorithm components
+- Application to specific real-world GIS and graphics problems
 
-
-Parameter Exploration:
-
-Systematic testing with λ values from 0 to 1
-Analysis of polygon characteristics and λ interaction
-
-
-
-⚠️ Known Limitations
-
-Assumes simple polygons (no self-intersections or holes)
-Fixed λ parameter requires re-running for different values
-Memory requirements could be significant for very large polygons
-The shortcut hull optimization has an unresolved issue that may produce valid but suboptimal hulls
-
-🔮 Future Work
-
-Extension to handle polygons with holes or self-intersections
-Implementation of dynamic λ parameter adjustment
-Further parallelization of algorithm components
-Application to specific real-world GIS and graphics problems
-
-📝 Citation
+# 📝 Citation
 If you use this implementation in your research, please cite:
-Nikolas Alexander Schwarz and Sabine Storandt. Efficient Computation of Crossing Components and Shortcut Hulls. 
-In 35th International Workshop on Combinatorial Algorithms (IWOCA 2024), 2024.
-👥 Contributors
 
-Zohaib Aslam (za08134)
-M. Mansoor Alam (ma08322)
-Team 24
+> Nikolas Alexander Schwarz and Sabine Storandt.  
+> _Efficient Computation of Crossing Components and Shortcut Hulls._  
+> In 35th International Workshop on Combinatorial Algorithms (IWOCA 2024), 2024.
 
-
-This README provides a comprehensive overview of your project, including setup instructions, features, testing methodology, performance analysis, and future directions. It maintains the style of your original README while incorporating the detailed information from your final report.
+# 👥 Contributors
+- Zohaib Aslam (za08134)
+- M. Mansoor Alam (ma08322)
+- Team 24
