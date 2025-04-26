@@ -48,27 +48,18 @@ The algorithm achieves significant improvements over previous approaches:
 
 ```
 
+---
+
 ## 🔍 How to Run
 
-1. Clone this repository:
+1. Download both `main.py` (from the `src` folder) and `test_polygon.py` (from the `tests` folder).
+2. Place both files in the **same folder**.
+3. Run the test file using:
    ```bash
-   git clone https://github.com/yourusername/shortcut-hulls.git
-   cd shortcut-hulls
+   python test_polygon.py
 
-Install dependencies:
-bashpip install matplotlib numpy shapely
+---
 
-Run the main test file:
-bashpython tests/test_polygon.py
-
-To experiment with different λ values (balancing perimeter vs area):
-bashpython tests/test_polygon.py --lambda 0.5
-
-For testing on larger polygons:
-bashpython tests/test_polygon.py --vertices 1000
-
-
-Generated visualizations will be saved in the results/ folder.
 🧪 Testing & Validation
 We've implemented comprehensive testing to validate correctness:
 
