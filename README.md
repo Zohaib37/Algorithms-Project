@@ -1,5 +1,3 @@
-# Updated Project Overview
-
 # Efficient Computation of Crossing Components and Shortcut Hulls
 
 This project implements and extends the algorithm described in the paper "Efficient Computation of Crossing Components and Shortcut Hulls" by Nikolas Alexander Schwarz and Sabine Storandt (2024). The algorithm efficiently simplifies complex polygon boundaries by creating shortcut hulls that reduce complexity while preserving shape integrity.
