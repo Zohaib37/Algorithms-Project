@@ -618,7 +618,7 @@ def test_fixed_shortcut_hull():
     plt.tight_layout()
     plt.savefig('fixed_lambda_effect.png')
     plt.show()
-        
+         
 if __name__ == "__main__":
 
     #Create shortcut hull and test
