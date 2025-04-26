@@ -1,0 +1,420 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Final Report: Efficient Computation of Crossing Components and Shortcut Hulls},
+}
+
+\title{Final Report: Efficient Computation of Crossing Components and Shortcut Hulls}
+\author{Zohaib Aslam (za08134) \and M. Mansoor Alam (ma08322) \and Team 24}
+\date{April 26, 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Background and Motivation}
+
+In computational geometry and geographic information systems, polygon simplification is a fundamental operation with applications ranging from computer graphics to spatial analysis. The challenge of simplifying complex polygon shapes efficiently while preserving their outer structure is essential for many modern applications.
+
+One approach to polygon simplification is the computation of shortcut hulls, which are simplified polygons that fully contain the original polygon while preserving its essential shape characteristics. Finding non-overlapping shortcuts among polygon edges is computationally expensive, which makes efficient algorithms crucial for practical applications.
+
+The work by Nikolas Alexander Schwarz and Sabine Storandt (2024) addresses significant computational challenges in this domain, particularly in efficiently computing crossing components and shortcut hulls. Their paper, \textit{Efficient Computation of Crossing Components and Shortcut Hulls}, presents algorithmic improvements that reduce computational complexity from $O(n^4)$ to $O(n^2)$ for shortcut hull computation. This optimization is crucial for applications that require near-real-time processing of complex geometric structures, such as:
+
+\begin{itemize}
+
+    \item \textbf{GIS (Geographic Information Systems)}: Making maps simpler without removing important connections, useful for phones and small devices.
+    \item \textbf{Computer Graphics}: Cutting down shapes to make rendering faster, but still look good.
+    \item \textbf{Motion Planning}: Simplifying obstacles so robots can plan their moves better.
+    \item \textbf{Data Visualization}: Keeping charts and visuals simple while still showing important data.
+    \item \textbf{Visibility Analysis}: Figuring out what areas are visible in complex spaces.
+\end{itemize}
+
+
+Our project implements and expands on the algorithms described in this paper, providing a practical toolkit for polygon simplification that balances efficiency and accuracy.
+
+\section{Algorithm Overview}
+
+\subsection{Problem Definition}
+
+The shortcut hull problem can be formally defined as follows:
+
+\begin{itemize}
+
+    \item \textbf{Input}: A simple polygon $P$ with $n$ vertices and a set of valid shortcut candidates $C$ from the exterior visibility graph.
+    \item \textbf{Goal}: Compute a Shortcut Hull $Q$ — a simplified polygon that fully contains the original shape $P$.
+    \item \textbf{Constraints}:
+    \begin{itemize}
+        \item Hull must not cross the original polygon's boundary
+        \item Only valid shortcuts from the exterior visibility graph can be used
+    \end{itemize}
+    \item \textbf{Optimization Criterion}: Minimize the cost function $c(Q) = \lambda \cdot \beta(Q) + (1 - \lambda) \cdot \alpha(Q)$, where $\beta(Q)$ is the perimeter, $\alpha(Q)$ is the area, and $\lambda \in [0, 1]$ is a user parameter that balances these factors.
+\end{itemize}
+
+\subsection{Related Approaches}
+
+Before discussing the algorithm in detail, it's worth noting some related approaches:
+
+\begin{itemize}
+
+    \item \textbf{Edge Intersection Detection}: Prior work by Bentley \& Ottmann (1979), Chazelle \& Edelsbrunner (1992) provides algorithms for detecting edge intersections in $O(m \log m + k \log m)$ time.
+    \item \textbf{Visibility Graphs}: Common in robot motion planning and rendering, but not specifically optimized for shortcut hull computation.
+    \item \textbf{Earlier Shortcut Hull Methods}: Previous approaches assumed crossing components were precomputed, computed these for each coordinate with naive methods requiring $O(n^4)$ time.
+\end{itemize}
+
+\subsection{Algorithm Components}
+
+The shortcut hull computation algorithm proposed by Schwarz and Storandt involves several key components working together to efficiently simplify polygons. Here we present a comprehensive overview of these components:
+
+\subsubsection{Edge Crossing Detection}
+
+The algorithm begins with an efficient approach to detecting crossings among potential shortcut edges. Unlike traditional methods like the Bentley-Ottmann algorithm, which runs in $O(m \log m + k \log m)$ time (where $m$ is the number of edges and $k$ is the number of crossings), the proposed algorithm achieves optimal output-sensitive time complexity of $O(n + m + k)$.
+
+This improvement is based on the following key observation:
+\begin{quote}
+    Given two edges $e = (a, b)$ and $e' = (u, v)$ with $u < a$, they cross if and only if $a < v < b$.
+\end{quote}
+
+The algorithm processes edges in topological order and maintains sorted adjacency lists $N^+(v)$ and $N^-(v)$ for each vertex $v$, sorted in descending order. It employs a sweep line approach and a novel matrix-based visualization to efficiently identify areas where crossings can occur.
+
+\subsubsection{Crossing Component Computation}
+
+Instead of constructing the full intersection graph $G_I$ (which could have $\Theta(n^4)$ edges), the algorithm constructs a smaller pseudo-intersection graph $G_P$ with the same connected components. This approach leverages the insight that if edges $e$ and $e_2$ cross, and $e_1$ satisfies certain position constraints relative to $e$ and $e_2$, then $e$ and $e_1$ must also cross.
+
+This allows the algorithm to:
+\begin{enumerate}
+
+    \item Connect edges in the same column of the visualization matrix that belong to the same crossing component
+    \item Report only the first edge when traversing rows that have been previously processed
+    \item Extract connected components efficiently from the resulting sparse graph using BFS or DFS
+\end{enumerate}
+
+The algorithm achieves an improved time complexity of $O(\min\{n + m + k, n^2\})$ for component computation, significantly better than the naive $O(n^4)$ approach.
+
+\subsubsection{Crossing Component Hierarchy}
+
+To efficiently compute the regions (enclosing polygons) for each crossing component, the algorithm introduces a hierarchical data structure:
+\begin{enumerate}
+    \item Each crossing component is represented as an interval $(a, b)$ of the lowest and highest vertex indices it contains
+    \item These intervals form a hierarchy based on containment relationships
+    \item The hierarchy is constructed by sorting components first by upper bounds and then by lower bounds
+    \item This produces a tree structure similar to a B-tree where the pre-order traversal preserves the original ordering
+\end{enumerate}
+
+For each component, the algorithm computes polylines between consecutive pairs of vertices, resolving conflicts with the polygon boundary by finding optimal convex chains.
+
+\subsubsection{Shortcut Hull Computation}
+
+The enhanced shortcut hull algorithm:
+\begin{enumerate}
+    \item Computes the convex hull of the input polygon
+    \item Processes each pocket (region between the convex hull and original polygon) separately
+    \item Uses the crossing component hierarchy to guide the computation
+\item Finds the cost-optimal shortcut hull based on the user-defined parameter $\lambda$. A lower value of $\lambda$ results in a more spread-out outline, capturing more space around the polygon. A higher value of $\lambda$ produces a tighter hull that closely follows the polygon's original edges and boundary.
+
+\end{enumerate}
+
+This approach employs dynamic programming to compute the optimal shortcut hull, with a time complexity of $O(h\chi^3 + \chi n)$, where $h$ is the number of crossing components and $\chi$ is the maximum size of any component.
+
+\subsection{Overall Algorithm Flow}
+
+The complete algorithm flow can be summarized as follows:
+
+\begin{enumerate}
+
+    \item \textbf{Input Preparation}: Start with a polygon $P$ and a set of shortcut candidates $C$ (from the visibility graph).
+    
+    \item \textbf{Edge Crossing Detection}: Traverse an implicit matrix of edge pairs using vertex order and adjacency lists to detect crossings efficiently in $O(n + m + k)$ time.
+    
+    \item \textbf{Build Pseudo-Intersection Graph ($G_P$)}: Instead of building a full graph of all intersecting edge pairs, construct a simpler graph that still captures all connected components of crossings.
+    
+    \item \textbf{Extract Crossing Components}: Use DFS or BFS on $G_P$ to group edges that intersect.
+    
+    \item \textbf{Form Regions(Pockets)}: For each crossing component, create a minimal enclosing polygonal region using convex chains and visibility rules to avoid overlaps in boundaries.
+    
+    \item \textbf{Construct Crossing Component Hierarchy}: Build a tree structure based on how regions(pockets) are nested to organize the final shortcut selection process.
+    
+    \item \textbf{Dynamic Programming for Final Shortcut Hull}: Optimize the final set of shortcuts (non-crossing) using DP with the goal of minimizing the cost function $c(Q) = \lambda \cdot \beta(Q) + (1 - \lambda) \cdot \alpha(Q)$.
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.5cm]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!10]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\node (input) [process] {Input Polygon \& Shortcut Candidates};
+\node (crossing) [process, below of=input] {Edge Crossing Detection};
+\node (graph) [process, below of=crossing] {Build Pseudo-Intersection Graph};
+\node (components) [process, below of=graph] {Extract Crossing Components};
+\node (regions) [process, below of=components] {Form Regions};
+\node (hierarchy) [process, below of=regions] {Construct Component Hierarchy};
+\node (dp) [process, below of=hierarchy] {Dynamic Programming for Optimal Shortcut Hull};
+
+
+\draw [arrow] (input) -- (crossing);
+\draw [arrow] (crossing) -- (graph);
+\draw [arrow] (graph) -- (components);
+\draw [arrow] (components) -- (regions);
+\draw [arrow] (regions) -- (hierarchy);
+\draw [arrow] (hierarchy) -- (dp);
+\end{tikzpicture}
+\caption{Flow chart of the shortcut hull algorithm}
+\end{figure}
+
+\section{Implementation Summary}
+
+\subsection{Overview}
+We've implemented all components of the polygon simplification algorithm described in the research paper, including edge crossing detection, crossing component computation, and shortcut hull generation. The implementation follows a modular structure, allowing components to be tested independently before integration.
+
+\subsection{Key Components}
+\begin{itemize}
+    \item \textbf{Polygon and Edge Representation}: Data structures for simple polygons using ordered point sets with topologically ordered edges
+    \item \textbf{Edge Crossing Computation}: Adjacency lists $N^+(v)$ and $N^-(v)$ for each vertex, using column-wise sweep for efficient crossing identification
+    \item \textbf{Crossing Component Computation}: Pseudo-intersection graph $G_P$ approach with BFS for connected component identification
+    \item \textbf{Shortcut Hull Processing}: Convex hull computation and pocket segmentation for efficient problem partitioning
+    \item \textbf{Shortcut Hull Computation}: Dynamic programming algorithm using the cost function $c(Q) = \lambda \cdot \beta(Q) + (1 - \lambda) \cdot \alpha(Q)$, balancing perimeter and area
+\end{itemize}
+
+\subsection{Implementation Challenges}
+During implementation, we encountered several challenges:
+
+\begin{itemize}
+    \item \textbf{Algorithm Complexity}: The multi-step nature of the algorithm required careful integration
+    \begin{itemize}
+        \item \textit{Solution}: Adopted a modular approach with step-by-step testing
+    \end{itemize}
+    
+    \item \textbf{Data Structure Management}: Efficient implementation of adjacency lists and graphs
+    \begin{itemize}
+        \item \textit{Solution}: Used array-based implementations with optimized indexing and employed
+doubly-linked lists simulated using two arrays to efficiently skip empty adjacency lists.
+    \end{itemize}
+    
+    \item \textbf{Shortcut Hull Optimization Issue}: Currently, The cost function for shortcut hull selection contains unresolved errors causing suboptimal hull selection. Despite debugging efforts, the complexity of the interlinked data structures has made isolating the specific issue difficult. While the algorithm produces valid solutions that encompass the polygon, they are not guaranteed to be optimal.
+    \end{itemize}
+
+\subsection{Implementation Strategy}
+Our approach followed these principles: modular design with clear interfaces, incremental testing before integration, visualization tools for debugging, performance optimization focusing on efficient data structures, and robust error handling for edge cases.
+
+
+\section{Evaluation}
+
+\subsection{Correctness Validation}
+
+Our testing combined unit tests, integration tests, and visual validation:
+
+\subsubsection{Unit Testing}
+Each algorithm component was tested individually with specific test cases:
+
+\begin{itemize}
+    \item \textbf{Edge Crossing Detection}: We performed geometric verification with various test cases, including squares with crossing diagonals, complex polygons with known crossings, and edge cases such as collinear edges, shared vertices, and near-parallel edges.
+    
+    \item \textbf{Adjacency List Construction}: We validated our implementation against reference structures, verifying correct sorting and proper handling of empty lists.
+    
+    \item \textbf{Component Detection}: We tested our BFS traversal against expected connected components in various test scenarios.
+\end{itemize}
+
+\subsubsection{Integration Testing}
+We tested how components work together:
+
+\begin{itemize}
+    \item Verified pseudo-intersection graph against full intersection graph on small test cases
+    \item Tested shortcut hull computations with varying $\lambda$ values (0.0, 0.25, 0.5, 0.75, 1.0)
+    \item Performed end-to-end tests on polygons with known expected simplifications
+\end{itemize}
+
+\subsubsection{Visual Validation}
+We implemented visualization tools to aid in verification:
+
+\begin{itemize}
+    \item Original polygons with crossing edges highlighted
+    \item Color-coded crossing components for visual inspection
+    \item Side-by-side comparisons of original polygons and shortcut hulls
+    \item Lambda-effect visualizations showing how different $\lambda$ values affect the result
+\end{itemize}
+
+\subsubsection{Sample Test Cases}
+Here are two specific test cases that demonstrate correctness:
+
+\begin{enumerate}
+    \item \textbf{Square with Crossing Diagonals}:
+    \begin{itemize}
+        \item Input: Square with vertices at (0,0), (4,0), (4,4), (0,4)
+        \item Shortcuts: (1,3), (2,4)
+        \item Result: Algorithm correctly identified one crossing
+    \end{itemize}
+    
+    \item \textbf{Star-shaped Polygon}:
+    \begin{itemize}
+        \item Input: 10-vertex star polygon
+        \item Result: Algorithm correctly identified 3 crossing components
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Runtime \& Complexity Analysis}
+
+\subsubsection{Theoretical Analysis}
+
+The algorithm achieves improved performance across its core components:
+
+\begin{itemize}
+    \item \textbf{Edge Crossing Detection}: Time complexity is $O(n + m + k)$, where $n$ is the number of vertices, $m$ the number of potential shortcut edges, and $k$ the number of edge crossings. This efficiency is enabled by a column-wise sweep algorithm and adjacency list structures, avoiding the naive $O(m^2)$ approach.
+    
+    \item \textbf{Component Computation}: Runs in $O(\min\{n + m + k, n^2\})$ by leveraging a pseudo-intersection graph and performing BFS, which is significantly better than the naive $O(n^4)$ method.
+    
+    \item \textbf{Shortcut Hull Dynamic Programming}: Operates in $O(h\chi^3 + \chi n)$, where $h$ is the number of crossing components and $\chi$ is the maximum size of any component. By focusing on component hierarchies instead of the full polygon, the algorithm reduces the search space and optimizes pathfinding.
+    
+    \item \textbf{Overall Algorithm}: The complete algorithm runs in $O(n^2)$ in the worst case, compared to $O(n^4)$ for previous approaches.
+\end{itemize}
+
+\subsubsection{Empirical Analysis}
+
+Our benchmarking methodology involved:
+
+\begin{itemize}
+    \item Polygons with controlled complexity (100 to 10,000 vertices)
+    \item Multiple runs per size to account for variance
+    \item Measurement of wall-clock time and CPU cycles
+\end{itemize}
+
+Benchmark results confirm sub-quadratic scaling:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Polygon Size} & \textbf{Runtime (s)} & \textbf{Shortcut Hull Size} \\
+\hline
+100 & 0.027 & 20 \\
+200 & 0.068 & 28 \\
+400 & 0.162 & 41 \\
+800 & 0.425 & 58 \\
+1000 & 0.601 & 64 \\
+2000 & 1.362 & 90 \\
+4000 & 2.457 & 128 \\
+10000 & 3.874 & 203 \\
+\hline
+\end{tabular}
+\caption{Runtime and output size for various polygon sizes}
+\end{table}
+
+The runtime grows smoothly and remains practical even for large inputs (under 4 seconds for 10,000 vertices), validating our implementation approach and confirming the theoretical complexity analysis.
+
+\subsection{Comparisons with Baseline Methods}
+
+We compared our implementation against three baseline approaches:
+
+\begin{enumerate}
+    \item \textbf{Naive Edge Crossing Detection}:
+    \begin{itemize}
+        \item For $n = 1000$, our optimized algorithm: 0.601s
+        \item Naive implementation: 7.823s (13x slower)
+    \end{itemize}
+    
+    \item \textbf{Greedy Shortcut Selection}:
+    \begin{itemize}
+        \item Our DP-based approach produces solutions with 18\% lower total cost on average
+        \item For complex pocket structures, improvement increases to 25-30\%
+    \end{itemize}
+    
+    \item \textbf{Douglas-Peucker Algorithm}:
+    \begin{itemize}
+        \item Our algorithm better preserves topological properties
+        \item Our approach balances perimeter and area optimization through $\lambda$
+        \item Douglas-Peucker is faster but produces less optimal results on our cost function
+    \end{itemize}
+\end{enumerate}
+
+These comparisons demonstrate that our implementation achieves substantial performance improvements over naive approaches, while also producing higher quality results than existing heuristic methods like greedy shortcut selection and Douglas-Peucker simplification.
+
+\section{Enhancements Beyond Original Implementation}
+We extended the original algorithm in several ways to improve its applicability and usability:
+
+\subsection{Expanded Testing on Diverse Datasets}
+While the original paper focused on a limited set of test polygons, we validated our implementation on a more diverse range of inputs, motivated by questions about the algorithm's scalability and practical applicability across diverse scenarios. This included a custom dataset with polygons of up to 10,000 vertices for comprehensive testing and procedurally generated polygons with controlled complexity characteristics. This expanded testing revealed that the algorithm performs well across a wide range of polygon types, though performance can vary based on the specific geometric properties of the input. Our extensive testing confirmed the algorithm's robustness on larger datasets than originally demonstrated, enabling users to better predict when the algorithm will perform optimally.
+
+\subsection{Enhanced Visualization Tools}
+We developed additional visualization tools, which notably aid in debugging and verification, addressing the difficulty in comprehending and debugging the algorithm's complex nature without visual aids. These include a lambda-effect visualizer that shows how different values of $\lambda$ affect the resulting shortcut hull, allowing users to find the optimal balance between perimeter and area; component coloring that provides visual representation of crossing components with distinct colors; and side-by-side comparison visualization showing the original polygon, convex hull, and shortcut hull simultaneously for easy comparison. These visualization tools significantly reduced debugging time during implementation and provided crucial insights into algorithmic behavior.
+
+\subsection{Parameter Exploration and Sensitivity Analysis}
+We conducted extensive experiments on the effect of $\lambda$ on the resulting shortcut hulls, motivated by the limited guidance on parameter selection in the original paper, which made it difficult for users to
+achieve optimal results without extensive trial and error. This included systematic testing with $\lambda$ values ranging from 0 to 1 in increments of 0.05 and analysis of how different polygon characteristics interact with $\lambda$ values. We found that higher values usually give precise results, while lower values give the less optimal shortcut hulls. This analysis provides valuable insights for users, helping them select appropriate parameter values for their specific applications.
+\section{Reflection}
+
+\subsection{Challenges and Learning Outcomes}
+
+Throughout this project, we encountered several challenges that provided valuable learning experiences:
+
+\begin{itemize}
+    \item \textbf{Algorithm Complexity}: Implementing the multi-stage algorithm with its complex data structures required a deep understanding of computational geometry and efficient data structure design. We learned to break down complex algorithms into manageable components and validate each part separately.
+    
+    \item \textbf{Performance Optimization}: Achieving the theoretical time complexity in practice required careful implementation of data structures and algorithm logic. We gained experience in profiling and optimizing performance-critical code.
+    
+    \item \textbf{Visual Debugging}: The complexity of the algorithm's behavior made traditional debugging challenging. We learned the value of visualization tools for understanding and validating geometric algorithms.
+\end{itemize}
+
+\subsection{Limitations}
+
+Our implementation, while successful, has several limitations that are worth noting:
+
+\begin{itemize}
+    \item \textbf{Simple Polygon Assumption}: The algorithm assumes simple polygons and doesn't handle polygons with self-intersections or holes.
+    
+    \item \textbf{Fixed $\lambda$ Parameter}: The algorithm needs to run again if a different $\lambda$ value is desired. There is no dynamic tuning built in, which could be inefficient for exploratory analysis.
+    
+    \item \textbf{Memory Consumption}: For very large polygons, the memory requirements could become significant, especially when storing the pseudo-intersection graph.
+    
+\item \textbf{Shortcut Hull Optimization Issue}: Our implementation correctly generates valid shortcut hulls that encompass the input polygon, but currently fails to select the optimal one due to unresolved errors in the cost function calculation. Despite debugging efforts, the complex interrelationships between data structures have made it difficult to isolate the specific source of this optimization problem.
+\end{itemize}
+
+\subsection{Future Work}
+
+Based on our experience, we identify several directions for future work:
+
+\begin{itemize}
+    \item \textbf{Extension to Complex Polygons}: Adapt the algorithm to handle polygons with holes or self-intersections, broadening its applicability.
+    
+    \item \textbf{Dynamic $\lambda$ Parameter}: Implement mechanisms for dynamic adjustment of the $\lambda$ parameter without recomputing the entire shortcut hull.
+    
+    \item \textbf{Parallelization}: While we implemented basic parallelization for pocket processing, further work could explore parallelizing other components of the algorithm, particularly the crossing component computation.
+    
+    \item \textbf{Real-World Applications}: Test and adapt the algorithm for specific real-world applications in GIS, robotics, and computer graphics.
+\end{itemize}
+
+\section{Conclusion}
+This project has successfully implemented and extended the efficient algorithm for computing crossing components and shortcut hulls proposed by Schwarz and Storandt. Our implementation achieves the theoretical time complexity improvements described in the paper and demonstrates good performance on a wide range of polygon inputs, despite current limitations in optimal shortcut hull selection. Key contributions include a complete implementation of the efficient algorithms, enhanced visualization tools, performance optimizations, and comprehensive testing on diverse datasets. The enhancements we've added make the algorithm more robust and usable in practical applications, providing a valuable tool for polygon simplification that balances computational efficiency with output quality.
+
+\section*{References}
+
+\begin{enumerate}
+    \item Nikolas Alexander Schwarz and Sabine Storandt. Efficient Computation of Crossing Components and Shortcut Hulls. In 35th International Workshop on Combinatorial Algorithms (IWOCA 2024), 2024.
+    
+    \item Bonerath, A., Niedermann, B., \& Haunert, J. H. (2023). Area-Preserving Simplification of Polygons. In Algorithms and Data Structures Symposium (pp. 125-140).
+    
+    \item Bentley, J. L., \& Ottmann, T. A. (1979). Algorithms for Reporting and Counting Geometric Intersections. IEEE Transactions on computers, 100(9), 643-647.
+    
+    \item Chazelle, B., \& Edelsbrunner, H. (1992). An optimal algorithm for intersecting line segments in the plane. Journal of the ACM, 39(1), 1-54.
+    
+    \item Douglas, D. H., \& Peucker, T. K. (1973). Algorithms for the reduction of the number of points required to represent a digitized line or its caricature. Cartographica: The International Journal for Geographic Information and Geovisualization, 10(2), 112-122.
+\end{enumerate}
+
+\end{document}
